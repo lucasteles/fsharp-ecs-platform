@@ -17,4 +17,4 @@ let movementVector =
     | ButtonDown Buttons.DPadDown -> Vector2(0.f, 1.f)
     | ButtonDown Buttons.DPadLeft -> Vector2(-1.f, 0.f)
     | ButtonDown Buttons.DPadRight -> Vector2(1.f, -0.f)
-    | _ as k -> k.ThumbSticks.Left
+    | _ as k -> k.ThumbSticks.Left * (vector2 1 -1)

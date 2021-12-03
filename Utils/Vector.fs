@@ -13,6 +13,10 @@ module Vector2 =
     let normalize (vector: Vector2) =
         if (vector <> Vector2.Zero) then vector.Normalize()
         vector
+    let Up = vector2 0 -1
+    let Down = vector2 0 1
+    let Left = vector2 -1 0
+    let Right = vector2 1 0
 
 type Vector2 with
     member this.WithX x = vector2 x this.Y
