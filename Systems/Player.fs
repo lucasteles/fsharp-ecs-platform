@@ -55,64 +55,54 @@ module private Logic =
 
 module private Systems =
     let load (world: Container) =
-            world.On (fun (LoadContent game) ->
-                        world.Create().With(create game) |> ignore)
+            world.On <| fun (LoadContent game) ->
+                world.Create()
+                     .With(create game) |> ignore
 
     let start (world: Container) =
-            world.On(
-                fun (Start game) struct (eid: Eid, _: Player) ->
-                    let entity = world.Get eid
+            world.On <| fun (Start game)  ->
+                for query in world.Query<Eid, Player>() do
+                    let entity = world.Get query.Value1
                     entity.Add(Logic.startPosition game)
                     entity.Add(Rotation 0f)
                     entity.Add(Scale 0f)
                     entity.Add(PlayerInput.zero)
                     entity.Add(Vector2.Zero |> Velocity)
-                    eid
-                |> Join.update2
-                |> Join.over world
-            )
-
 
     let scaleLogo (world: Container) =
-            world.On<Update>(
-                fun update struct (Scale scale, _: Player) ->
-                    Logic.updateScale update.DeltaTime.seconds scale
-                |> Join.update2
-                |> Join.over world
-            )
+            world.On<Update> <| fun update ->
+                for query in world.Query<Scale, Player>() do
+                    let (Scale value) = query.Value1
+                    let comp = &query.Value1
+                    comp <- Logic.updateScale update.DeltaTime.seconds value
+
 
     let rotateLogo (world: Container) =
-            world.On<Update>(
-                fun update struct (Rotation rot, _: Player) ->
-                    Logic.updateRotation update.DeltaTime.seconds rot
-                |> Join.update2
-                |> Join.over world
-            )
-
+            world.On<Update> <| fun update ->
+                for query in world.Query<Rotation, Player>() do
+                    let (Rotation rot) = query.Value1
+                    let comp = &query.Value1
+                    comp <- Logic.updateRotation update.DeltaTime.seconds rot
 
     let updateVelocity (world: Container) =
-            world.On<Update>(
-                fun _ struct (Velocity _, input: PlayerInput, player: Player) ->
-                    Velocity (input.Direction * player.Speed)
-                |> Join.update3
-                |> Join.over world
-            )
+            world.On<Update> <| fun _ ->
+                for query in world.Query<Velocity, PlayerInput, Player>() do
+                   let struct (_,input,player) = query.Values
+                   let comp = &query.Value1
+                   comp <- (input.Direction * player.Speed) |> Velocity
+
     let updateLogoPosition (world: Container) =
-            world.On<Update>(
-                fun update struct (Position position, Velocity velocity, _: Player) ->
-                    Logic.updatePosition update.DeltaTime.seconds
-                                   position
-                                   velocity
-                |> Join.update3
-                |> Join.over world
-            )
+            world.On<Update> <| fun update ->
+                for query in world.Query<Position, Velocity, Player>() do
+                    let struct (Position position, Velocity velocity, _) = query.Values
+                    let comp = &query.Value1
+                    comp <- Logic.updatePosition update.DeltaTime.seconds position velocity
+
     let drawLogo (world: Container) =
-        world.On<Draw>(
-            fun e struct (rot: Rotation, scale: Scale, pos: Position, player: Player) ->
+        world.On<Draw> <| fun e ->
+            for query in world.Query<Rotation, Scale, Position, Player>() do
+                let struct (rot, scale, pos, player) = query.Values
                 Logic.drawLogo e.SpriteBatch player pos rot scale
-            |> Join.iter4
-            |> Join.over world
-        )
 
 let configure (world: Container) =
     [

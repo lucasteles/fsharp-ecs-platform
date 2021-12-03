@@ -15,10 +15,10 @@ let direction () =
     Vector2.normalize dir
 
 let configure (world: Container) = [
-    // quit game system
-    world.On<Update>(
-        fun _ (_: PlayerInput) ->
-            { Direction = direction() }
-        |> Join.update1
-        |> Join.over world)
+    world.On<Update> <|
+        fun _ ->
+            for query in world.Query<PlayerInput>() do
+                let playerInput = &query.Value
+                playerInput <- { Direction = direction() }
     ]
+
