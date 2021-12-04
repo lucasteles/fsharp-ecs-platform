@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
+    <Compile Include="Scenes.fs" />
   </ItemGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
@@ -34,6 +35,7 @@
     <Compile Include="Utils\Vector.fs" />
     <Compile Include="Utils\Keyboard.fs" />
     <Compile Include="Utils\GamePad.fs" />
+    <Compile Include="Utils\Scene.fs" />
     <Compile Include="Utils\Events.fs" />
     <Compile Include="Components\Transform.fs" />
     <Compile Include="Components\UI.fs" />
@@ -41,8 +43,7 @@
     <Compile Include="Systems\Input.fs" />
     <Compile Include="Systems\Exit.fs" />
     <Compile Include="Systems\Player.fs" />
-    <Compile Include="Scenes\Scene.fs" />
-    <Compile Include="Setup.fs" />
+    <Compile Include="SceneSetup.fs" />
     <Compile Include="Game1.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

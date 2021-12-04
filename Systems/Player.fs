@@ -89,7 +89,6 @@ module private Systems =
     let drawLogo (world: Container) =
         world.On<Draw> <| fun e ->
             for query in world.Query<Transform, Player>() do
-                log query.Values
                 let struct (transform, player) = query.Values
                 Logic.drawLogo e.SpriteBatch player transform
 

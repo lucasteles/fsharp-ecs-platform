@@ -1,9 +1,7 @@
-module GameLogic
+module SceneSetup
 open Game
+open Game.Scenes
 open Game.Systems
-
-type SceneName = Play
-
 
 let scenes () = [
         Scene.create SceneName.Play [ Input.configure
