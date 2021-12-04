@@ -19,36 +19,31 @@ module private Logic =
             (single clientBounds.Width / 2f)
             (single clientBounds.Height / 2f)
 
-    let updateRotation deltaTime  rot =
-        rot + 0.1f * deltaTime |> Rotation
+    let updateRotation deltaTime  (Rotation rot) =
+        rot + 0.1f<Radians> * deltaTime |> Rotation
 
-    let updateScale deltaTime scale =
+    let updateScale deltaTime (ScalarScale scale) =
         if (scale < 2f)
         then scale + 2f * deltaTime
         else scale
-        |> Scale
+        |> ScalarScale
 
-    let updatePosition deltaTime position velocity =
+    let updatePosition deltaTime (Position position) velocity =
         Position (position + velocity * deltaTime)
 
-    let drawLogo (spriteBatch: SpriteBatch)
-                 (logo: Player)
-                 (Position position)
-                 (Rotation rotation)
-                 (Scale scale) =
+    let drawLogo (spriteBatch: SpriteBatch) player transform =
+
         let logoCenter =
             (vector2
-                logo.Texture.Bounds.Width
-                logo.Texture.Bounds.Height) / 2f
+                player.Texture.Bounds.Width
+                player.Texture.Bounds.Height) / 2f
 
         spriteBatch.Draw(
-            logo.Texture,
-            position,
-            logo.Texture.Bounds,
+            player.Texture,
+            transform,
+            player.Texture.Bounds,
             Color(255, 255, 255, 80),
-            rotation,
             logoCenter,
-            scale,
             SpriteEffects.None,
             0f
         )
@@ -63,26 +58,26 @@ module private Systems =
             world.On <| fun (Start game)  ->
                 for query in world.Query<Eid, Player>() do
                     let entity = world.Get query.Value1
-                    entity.Add(Logic.startPosition game)
-                    entity.Add(Rotation 0f)
-                    entity.Add(Scale 0f)
-                    entity.Add(PlayerInput.zero)
-                    entity.Add(Vector2.Zero |> Velocity)
+                    Transform.create (Logic.startPosition game, Rotation 0f<Radians>, ScalarScale 0f) |> entity.Add
+                    PlayerInput.zero |> entity.Add
+                    Vector2.Zero |> Velocity |> entity.Add
 
-    let scaleLogo (world: Container) =
+    let animatePlayer (world: Container) =
             world.On<Update> <| fun update ->
-                for query in world.Query<Scale, Player>() do
-                    let (Scale value) = query.Value1
+                for query in world.Query<Transform, Player>() do
+                    let transform = query.Value1
                     let comp = &query.Value1
-                    comp <- Logic.updateScale update.DeltaTime.seconds value
+                    comp <- { transform with
+                                  ScalarScale = Logic.updateScale update.DeltaTime.seconds transform.ScalarScale
+                                  Rotation = Logic.updateRotation update.DeltaTime.seconds transform.Rotation }
 
-
-    let rotateLogo (world: Container) =
+    let updatePlayerPosition (world: Container) =
             world.On<Update> <| fun update ->
-                for query in world.Query<Rotation, Player>() do
-                    let (Rotation rot) = query.Value1
+                for query in world.Query<Transform, Velocity, Player>() do
+                    let struct ({Position = position} as transform,
+                                Velocity velocity, _) = query.Values
                     let comp = &query.Value1
-                    comp <- Logic.updateRotation update.DeltaTime.seconds rot
+                    comp <- { transform with Position = Logic.updatePosition update.DeltaTime.seconds position velocity }
 
     let updateVelocity (world: Container) =
             world.On<Update> <| fun _ ->
@@ -91,26 +86,19 @@ module private Systems =
                    let comp = &query.Value1
                    comp <- (input.Direction * player.Speed) |> Velocity
 
-    let updateLogoPosition (world: Container) =
-            world.On<Update> <| fun update ->
-                for query in world.Query<Position, Velocity, Player>() do
-                    let struct (Position position, Velocity velocity, _) = query.Values
-                    let comp = &query.Value1
-                    comp <- Logic.updatePosition update.DeltaTime.seconds position velocity
-
     let drawLogo (world: Container) =
         world.On<Draw> <| fun e ->
-            for query in world.Query<Rotation, Scale, Position, Player>() do
-                let struct (rot, scale, pos, player) = query.Values
-                Logic.drawLogo e.SpriteBatch player pos rot scale
+            for query in world.Query<Transform, Player>() do
+                log query.Values
+                let struct (transform, player) = query.Values
+                Logic.drawLogo e.SpriteBatch player transform
 
 let configure (world: Container) =
     [
        Systems.load world
        Systems.start world
-       Systems.scaleLogo world
-       Systems.rotateLogo world
+       Systems.animatePlayer world
        Systems.updateVelocity world
-       Systems.updateLogoPosition world
+       Systems.updatePlayerPosition world
        Systems.drawLogo world
     ]

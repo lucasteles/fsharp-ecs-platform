@@ -10,5 +10,5 @@ type PlayerInput = { Direction: Vector2 }
 [<Struct>]
 type Player = {
     Texture: Texture2D
-    Speed: float
+    Speed: single
 }

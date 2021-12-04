@@ -2,9 +2,6 @@
 module VectorModule
 open Microsoft.Xna.Framework
 
-type double = float
-type float = float32
-
 let inline vector2 x y = Vector2(single x, single y)
 
 let rect (location:Vector2) (size:Vector2) = Rectangle(location.ToPoint(), size.ToPoint())

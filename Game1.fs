@@ -9,21 +9,21 @@ type Game1() as this =
     inherit Game()
 
     let graphics = new GraphicsDeviceManager(this)
-    let mutable disposables = Unchecked.defaultof<_>
+    let mutable dispose = Unchecked.defaultof<_>
     let mutable spriteBatch = Unchecked.defaultof<_>
 
     let world = Container()
 
     do this.Content.RootDirectory <- "Content"
        this.IsMouseVisible <- true
-       disposables <- GameLogic.configureWorld world
+       dispose <- GameLogic.configureWorld world |> Disposable.Create
 
     override this.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
         world.Run (LoadContent this)
 
     override this.UnloadContent() =
-        for d in disposables do d.Dispose()
+        dispose.Dispose()
 
     override this.Initialize() =
         graphics.PreferredBackBufferWidth <- 1024
@@ -38,7 +38,7 @@ type Game1() as this =
         base.Update gameTime
 
     override this.Draw gameTime =
-        this.GraphicsDevice.Clear Color.Gray
+        this.GraphicsDevice.Clear Color.DarkGray
         spriteBatch.Begin()
         world.Run { Time = gameTime.ElapsedGameTime
                     SpriteBatch = spriteBatch }
