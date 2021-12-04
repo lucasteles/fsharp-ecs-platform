@@ -7,10 +7,8 @@ open Microsoft.Xna.Framework.Input
 open Game.Components.Features
 
 let direction () =
-    let keyboard = Keyboard.GetState()
-    let gamepad = GamePad.GetState(PlayerIndex.One)
-    let kbDir = Keyboard.movementVector keyboard
-    let padDir = GamePad.movementVector gamepad
+    let kbDir = Keyboard.GetState() |> Keyboard.movementVector
+    let padDir = GamePad.GetState(PlayerIndex.One) |> GamePad.movementVector
     let dir = kbDir + padDir
     Vector2.normalize dir
 
