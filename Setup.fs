@@ -1,14 +1,15 @@
 module GameLogic
-
+open Game
 open Game.Systems
-open Garnet.Composition
 
-let configureWorld (world: Container) =
+type SceneName = Play
 
-    let configs = [
-        Input.configure world
-        Player.configure world
-        Exit.configure world
+
+let scenes () = [
+        Scene.create SceneName.Play [ Input.configure
+                                      Player.configure
+                                      Exit.configure ]
+
     ]
 
-    configs |> List.collect id
+

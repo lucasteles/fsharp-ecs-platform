@@ -41,7 +41,7 @@
     <Compile Include="Systems\Input.fs" />
     <Compile Include="Systems\Exit.fs" />
     <Compile Include="Systems\Player.fs" />
-    <Folder Include="Scenes" />
+    <Compile Include="Scenes\Scene.fs" />
     <Compile Include="Setup.fs" />
     <Compile Include="Game1.fs" />
     <Compile Include="Program.fs" />
