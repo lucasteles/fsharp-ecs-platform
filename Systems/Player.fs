@@ -6,6 +6,7 @@ open Game.Events
 open Garnet.Composition
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
+open VectorModule
 
 let create (game: Game) = {
     Texture = game.Content.Load("logo")
@@ -22,11 +23,11 @@ module private Logic =
     let updateRotation deltaTime  (Rotation rot) =
         rot + 0.1f<Radians> * deltaTime |> Rotation
 
-    let updateScale deltaTime (ScalarScale scale) =
-        if (scale < 2f)
-        then scale + 2f * deltaTime
+    let updateScale deltaTime (Scale scale) =
+        if (scale.X < 2f)
+        then scale + Vector2(2f) * deltaTime
         else scale
-        |> ScalarScale
+        |> Scale
 
     let updatePosition deltaTime (Position position) velocity =
         Position (position + velocity * deltaTime)
@@ -58,7 +59,7 @@ module private Systems =
             world.On <| fun (Start game)  ->
                 for query in world.Query<Eid, Player>() do
                     let entity = world.Get query.Value1
-                    Transform.create (Logic.startPosition game, Rotation 0f<Radians>, ScalarScale 0f) |> entity.Add
+                    Transform.create (Logic.startPosition game, Rotation 0f<Radians>, Scale Vector2.One) |> entity.Add
                     PlayerInput.zero |> entity.Add
                     Vector2.Zero |> Velocity |> entity.Add
 
@@ -68,7 +69,7 @@ module private Systems =
                     let transform = query.Value1
                     let comp = &query.Value1
                     comp <- { transform with
-                                  ScalarScale = Logic.updateScale update.DeltaTime.seconds transform.ScalarScale
+                                  Scale = Logic.updateScale update.DeltaTime.seconds transform.Scale
                                   Rotation = Logic.updateRotation update.DeltaTime.seconds transform.Rotation }
 
     let updatePlayerPosition (world: Container) =

@@ -15,22 +15,16 @@ module Position =
 [<Struct>] type Rotation =  Rotation of single<Radians>
 [<Struct>] type Scale = Scale of Vector2
 [<Struct>] type ScalarScale = ScalarScale of single
+
 [<Struct>] type Transform =
               { Position: Position
                 Scale: Scale
-                ScalarScale: ScalarScale
                 Rotation: Rotation }
-              static member create (position, rotation, scale: ScalarScale) =
-                { Position = position
-                  Rotation = rotation
-                  ScalarScale = scale
-                  Scale = Scale Vector2.One }
-              static member create (position, rotation, scale: Scale) =
-                { Position = position
-                  Rotation = rotation
-                  ScalarScale = ScalarScale 1f
-                  Scale = scale }
-
+module Transform =
+    let create (position, rotation, scale) =
+        { Position = position
+          Rotation = rotation
+          Scale = scale }
     let tuple { Position = position
                 Rotation = rotation
                 Scale =  scale } =
@@ -53,8 +47,8 @@ module SpriteBatch =
            this.Draw(texture, position, sourceRectangle, color, rotation / 1f<Radians>, origin, scale, effects, layerDepth)
         member this.Draw(texture , Position position, sourceRectangle, color, Rotation rotation, origin, (ScalarScale scale), effects,layerDepth) =
            this.Draw(texture, position, sourceRectangle, color, rotation / 1f<Radians>, origin, scale, effects, layerDepth)
-        member this.Draw(texture, { Position=Position position; Rotation=Rotation rotation; Scale=Scale scale; ScalarScale=ScalarScale scalarScale }, sourceRectangle, color, origin, effects,layerDepth) =
-           this.Draw(texture, position, sourceRectangle, color, rotation / 1f<Radians>, origin, scalarScale * scale, effects, layerDepth)
+        member this.Draw(texture, { Position=Position position; Rotation=Rotation rotation; Scale=Scale scale  }, sourceRectangle, color, origin, effects,layerDepth) =
+           this.Draw(texture, position, sourceRectangle, color, rotation / 1f<Radians>, origin, scale, effects, layerDepth)
         member this.Draw(texture, Position position, sourceRectangle, color) =
            this.Draw(texture, position, ValueOption.toNullable sourceRectangle, color)
         member this.Draw(texture: Texture2D, destinationRectangle: Rectangle, sourceRectangle:ValueOption<Rectangle>, color) =
