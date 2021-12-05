@@ -27,6 +27,7 @@
   <ItemGroup>
 <!--    <PackageReference Include="Garnet" Version="0.3.0" />-->
     <PackageReference Include="Garnet" Version="0.5.3" />
+    <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
   </ItemGroup>
@@ -39,10 +40,16 @@
     <Compile Include="Utils\Events.fs" />
     <Compile Include="Components\Transform.fs" />
     <Compile Include="Components\UI.fs" />
+    <Compile Include="Components\Collider.fs" />
     <Compile Include="Components\Features.fs" />
+    <Compile Include="Components\Gravity.fs" />
     <Compile Include="Systems\Input.fs" />
     <Compile Include="Systems\Exit.fs" />
     <Compile Include="Systems\Player.fs" />
+    <Compile Include="Systems\Obstacles.fs" />
+    <Compile Include="Systems\Collision.fs" />
+    <Compile Include="Systems\ColliderDebug.fs" />
+    <Compile Include="Systems\Gravity.fs" />
     <Compile Include="SceneSetup.fs" />
     <Compile Include="Game1.fs" />
     <Compile Include="Program.fs" />

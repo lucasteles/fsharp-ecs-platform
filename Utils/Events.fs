@@ -15,4 +15,4 @@ open Microsoft.Xna.Framework.Graphics
                 member _.Data(LoadContent game) = game
 
 [<Struct>] type Update = { DeltaTime: TimeSpan; Game: Game; ChangeScene: SceneName -> unit }
-[<Struct>] type Draw = { Time: TimeSpan; SpriteBatch: SpriteBatch}
+[<Struct>] type Draw = { Time: TimeSpan; SpriteBatch: SpriteBatch; Game: Game}

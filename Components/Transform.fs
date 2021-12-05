@@ -1,17 +1,18 @@
-﻿module Game.Components.Transform
+﻿namespace Game.Components
 
-open System
-open System.Drawing
-open System.Numerics
-open System.Numerics
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 
 [<Measure>] type Radians
 
-[<Struct>] type Position = Position of Vector2
+[<Struct>] type Position =
+                Position of Vector2
+                    member this.value =
+                        let (Position pos) = this
+                        pos
 module Position =
     let inline create x y = vector2 x y |> Position
+
 [<Struct>] type Rotation =  Rotation of single<Radians>
 [<Struct>] type Scale = Scale of Vector2
 [<Struct>] type ScalarScale = ScalarScale of single

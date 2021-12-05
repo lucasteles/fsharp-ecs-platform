@@ -4,7 +4,6 @@ open Game
 open Game.Events
 open Game.Scenes
 open Garnet.Composition
-open SceneSetup
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 
@@ -55,7 +54,8 @@ type Game1() as this =
         let world = containers.[sceneIndex]
         spriteBatch.Begin()
         world.Run { Time = gameTime.ElapsedGameTime
-                    SpriteBatch = spriteBatch }
+                    SpriteBatch = spriteBatch
+                    Game = this}
         spriteBatch.End()
 
         base.Draw(gameTime)

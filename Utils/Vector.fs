@@ -16,7 +16,7 @@ module Vector2 =
     let Right = vector2 1 0
 
 type Vector2 with
-    member this.WithX x = vector2 x this.Y
-    member this.WithY y = vector2 this.X y
+    member inline this.WithX x = vector2 x this.Y
+    member inline this.WithY y = vector2 this.X y
 
 let (|Vec|_|) v = v |> Vector2.toTuple |> Some

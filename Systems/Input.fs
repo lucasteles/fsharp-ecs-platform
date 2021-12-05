@@ -1,10 +1,10 @@
 module Game.Systems.Input
 
+open Game.Components
 open Game.Events
 open Garnet.Composition
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Input
-open Game.Components.Features
 
 let direction () =
     let kbDir = Keyboard.GetState() |> Keyboard.movementVector
