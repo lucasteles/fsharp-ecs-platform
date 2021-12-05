@@ -19,18 +19,22 @@ let drawTransform (world: Container) =
 
 let drawColliders (world: Container) =
     world.On<Draw> <| fun e ->
-        for query in world.Query<Collider, SpriteRenderer>() do
-            let struct (collider, sprite) = query.Values
-            e.SpriteBatch.Draw(
-                sprite.Texture,
-                collider.ColliderBounds.TopLeft,
-                collider.ColliderBounds,
-                sprite.Color,
-                0f,
-                sprite.Origin,
-                1f,
-                sprite.Effects,
-                sprite.LayerDepth)
+        for query in world.Query<Eid,ColliderGroup, SpriteRenderer>() do
+            let struct (eid, colliderGroup, sprite) = query.Values
+            let entity = world.Get eid
+            let hasTransform,_ = entity.TryGet<Transform>()
+            if not hasTransform then
+                for collider in colliderGroup.Colliders do
+                    e.SpriteBatch.Draw(
+                        sprite.Texture,
+                        collider.ColliderBounds.TopLeft,
+                        collider.ColliderBounds,
+                        sprite.Color,
+                        0f,
+                        sprite.Origin,
+                        1f,
+                        sprite.Effects,
+                        sprite.LayerDepth)
 
 let configure (world: Container) =
       [drawTransform world

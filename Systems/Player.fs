@@ -11,14 +11,14 @@ module private Logic =
     let create (game: Game) = {
         Speed = 300f
         Size = Vector2(50f,80f)
-        JumpForce = 1000f
+        JumpForce = 550f
         PlayerState = PlayerState.Idle
     }
 
     let startPosition (game: Game) =
         let clientBounds = game.Window.ClientBounds
         Position.create
-            (single clientBounds.Width / 2f)
+            (single clientBounds.Width / 4f)
             (single clientBounds.Height / 2f)
 
     let updatePosition deltaTime (Position position) velocity =
@@ -39,7 +39,11 @@ module private Systems =
                     entity.Add PlayerInput.zero
                     entity.Add (Velocity Vector2.Zero)
                     entity.Add Gravity.default'
-                    entity.Add (Collider.create (-player.Size/2f) player.Size)
+                    entity.Add (Collider.group [|
+                                  (Collider.create (-player.Size/2f) player.Size)
+                                  (Collider.trigger (vector2 (-player.Size.X/2f+10f) (player.Size.Y/2f))
+                                                    (vector2 (player.Size.X-20f) 20f))
+                              |])
                     entity.Add (SpriteRenderer.create (colorTexture game Color.DarkRed,
                                                        rect Vector2.Zero player.Size,
                                                        Color.White,
@@ -66,11 +70,10 @@ module private Systems =
                        let playerRef = &query.Value3
                        playerRef  <- { player with PlayerState = PlayerState.Jump }
 
-
-    let collision (world: Container) =
-        world.On<CollisionEnter> <| fun collision ->
+    let trigger (world: Container) =
+        world.On<TriggerEnter> <| fun trigger ->
             for query in world.Query<Player, Eid>() do
-                if collision.Is(query.Value2) then
+                if trigger.Is(query.Value2) then
                     let player = query.Value1
                     let playerRef = &query.Value1
                     if player.PlayerState = PlayerState.Jump then
@@ -82,5 +85,5 @@ let configure (world: Container) =
        Systems.start world
        Systems.updateVelocity world
        Systems.updatePlayerPosition world
-       Systems.collision world
+       Systems.trigger world
     ]

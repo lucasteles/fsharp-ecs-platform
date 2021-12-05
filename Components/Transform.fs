@@ -39,6 +39,7 @@ module Transform =
 [<Struct>] type Velocity = Velocity of Vector2
 module Velocity =
     let inline create x y = vector2 x y |> Velocity
+    let zero = Vector2.Zero |> Velocity
 
 
 [<AutoOpen>]

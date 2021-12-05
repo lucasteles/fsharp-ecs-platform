@@ -9,14 +9,16 @@ open MonoGame.Extended
 module private Systems =
     let draw (world: Container) =
             world.On<Draw> <| fun e ->
-                for actor in world.Query<Collider, Eid>() do
-                    let struct (collider, eid) = actor.Values
-                    let entity = world.Get eid
-                    match entity.TryGet<Transform>() with
-                    | true, {Position=Position pos} ->
-                        e.SpriteBatch.DrawRectangle(collider.ColliderBounds.OffsetValue(pos).ToRectangleF(), Color.Yellow, 5f)
-                    | false, _ ->
-                        e.SpriteBatch.DrawRectangle(collider.ColliderBounds.ToRectangleF(), Color.Green, 5f)
+                for actor in world.Query<ColliderGroup, Eid>() do
+                    let struct (colliderGroup, eid) = actor.Values
+                    for collider in colliderGroup.Colliders do
+                        let entity = world.Get eid
+                        match entity.TryGet<Transform>() with
+                        | true, {Position=Position pos} ->
+                            let color = if collider.IsTrigger then Color.Magenta else Color.Yellow
+                            e.SpriteBatch.DrawRectangle(collider.ColliderBounds.OffsetValue(pos).ToRectangleF(), color, 3f)
+                        | false, _ ->
+                            e.SpriteBatch.DrawRectangle(collider.ColliderBounds.ToRectangleF(), Color.Green, 3f)
 
 
 let configure (world: Container) =
