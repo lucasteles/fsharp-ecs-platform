@@ -10,7 +10,7 @@ let scenes () = [
                                       Player.configure
                                       Exit.configure
                                       Obstacles.configure
-                                     // ColliderDebug.configure
+                                      ColliderDebug.configure
                                       Collision.configure
                                       ]
 

@@ -32,8 +32,7 @@ module private Systems =
                             let dir = vector2 (MathF.Round(rawDirection.X)) (MathF.Round(rawDirection.Y))
                             let transformRef = &actor.Value1
                             transformRef <- {  transform
-                                               with Position =
-                                                       Position (position - velocity * dir * e.DeltaTime.seconds) }
+                                               with Position = Position (position - overlap.Size.ToVector2() * dir ) }
 
                             let velocityRef = &actor.Value2
                             velocityRef <- Velocity (velocity - velocity * dir)

@@ -16,4 +16,4 @@ open Microsoft.Xna.Framework.Graphics
                 member _.Data(LoadContent game) = game
 [<Struct>] type CollisionEnter = { Game: Game; From:Eid; FromBounds:Rectangle; Other: Eid; Bounds: Rectangle }
 [<Struct>] type Update = { DeltaTime: TimeSpan; Game: Game; ChangeScene: SceneName -> unit }
-[<Struct>] type Draw = { Time: TimeSpan; SpriteBatch: SpriteBatch; Game: Game}
+[<Struct>] type Draw = { DeltaTime: TimeSpan; SpriteBatch: SpriteBatch; Game: Game}

@@ -53,7 +53,7 @@ type Game1() as this =
         this.GraphicsDevice.Clear Color.DarkGray
         let world = containers.[sceneIndex]
         spriteBatch.Begin()
-        world.Run { Time = gameTime.ElapsedGameTime
+        world.Run { DeltaTime = gameTime.ElapsedGameTime
                     SpriteBatch = spriteBatch
                     Game = this}
         spriteBatch.End()
