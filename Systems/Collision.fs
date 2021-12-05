@@ -1,5 +1,6 @@
 module Game.Systems.Collision
 
+open System
 open Game.Components
 open Game.Events
 open Garnet.Composition
@@ -27,14 +28,15 @@ module private Systems =
                         if (eid <> colliderEid && actorRectangle.Intersects(colliderRectangle)) then
 
                             let overlap = Rectangle.Intersect(actorRectangle, colliderRectangle)
-                            let dir = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
+                            let rawDirection = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
+                            let dir = vector2 (MathF.Round(rawDirection.X)) (MathF.Round(rawDirection.Y))
                             let transformRef = &actor.Value1
                             transformRef <- {  transform
                                                with Position =
                                                        Position (position - velocity * dir * e.DeltaTime.seconds) }
 
                             let velocityRef = &actor.Value2
-                            velocityRef <- Velocity Vector2.Zero
+                            velocityRef <- Velocity (velocity - velocity * dir)
                             world.Send({ Game = e.Game
                                          From = eid
                                          FromBounds = actorRectangle
