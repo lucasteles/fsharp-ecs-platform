@@ -61,10 +61,7 @@ module private Systems =
                    let jump = input.Jump = PlayerButtomState.Pressed && player.PlayerState <> PlayerState.Jump
 
                    let velocityRef = &query.Value1
-                   velocityRef <- Vector2(
-                               input.Direction.X * player.Speed,
-                               vel.Y + (if jump then -player.JumpForce else 0f)
-                           ) |> Velocity
+                   velocityRef <- Velocity.create (input.Direction.X * player.Speed) (vel.Y + (if jump then -player.JumpForce else 0f))
                    if jump then
                        let playerRef = &query.Value3
                        playerRef  <- { player with PlayerState = PlayerState.Jump }
