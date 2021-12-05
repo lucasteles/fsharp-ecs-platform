@@ -5,16 +5,10 @@ open Game.Events
 open Garnet.Composition
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
-open VectorModule
-open VectorModule
-open VectorModule
-open VectorModule
-open VectorModule
 
 module private Logic =
 
     let create (game: Game) = {
-        Texture = colorTexture game Color.DarkRed
         Speed = 300f
         Size = Vector2(50f,80f)
         JumpForce = 1000f
@@ -30,18 +24,6 @@ module private Logic =
     let updatePosition deltaTime (Position position) velocity =
         Position (position + velocity * deltaTime)
 
-    let drawLogo (spriteBatch: SpriteBatch) player transform =
-
-        spriteBatch.Draw(
-            player.Texture,
-            transform,
-            rect Vector2.Zero player.Size,
-            Color.White,
-            player.Size / 2f,
-            SpriteEffects.None,
-            0f
-        )
-
 module private Systems =
     let load (world: Container) =
             world.On <| fun (LoadContent game) ->
@@ -53,12 +35,16 @@ module private Systems =
                 for query in world.Query<Eid, Player>() do
                     let player = query.Value2
                     let entity = world.Get query.Value1
-                    let transform = (Logic.startPosition game, Rotation 0f<Radians>, Scale Vector2.One) |> Transform.create
-                    transform |> entity.Add
-                    PlayerInput.zero |> entity.Add
-                    Vector2.Zero |> Velocity |> entity.Add
-                    Gravity.default' |> entity.Add
-                    {ColliderBounds = rect (-player.Size/2f) player.Size} |> entity.Add
+                    entity.Add (Transform.create(Logic.startPosition game, Rotation 0f<Radians>, Scale Vector2.One))
+                    entity.Add PlayerInput.zero
+                    entity.Add (Velocity Vector2.Zero)
+                    entity.Add Gravity.default'
+                    entity.Add (Collider.create (-player.Size/2f) player.Size)
+                    entity.Add (SpriteRenderer.create (colorTexture game Color.DarkRed,
+                                                       rect Vector2.Zero player.Size,
+                                                       Color.White,
+                                                       player.Size / 2f,
+                                                       SpriteEffects.None, 0f) )
 
     let updatePlayerPosition (world: Container) =
             world.On<Update> <| fun update ->
@@ -93,19 +79,11 @@ module private Systems =
                     if player.PlayerState = PlayerState.Jump then
                         playerRef <- {player with PlayerState = PlayerState.Idle}
 
-
-    let draw (world: Container) =
-        world.On<Draw> <| fun e ->
-            for query in world.Query<Transform, Player>() do
-                let struct (transform, player) = query.Values
-                Logic.drawLogo e.SpriteBatch player transform
-
 let configure (world: Container) =
     [
        Systems.load world
        Systems.start world
        Systems.updateVelocity world
        Systems.updatePlayerPosition world
-       Systems.draw world
        Systems.collision world
     ]

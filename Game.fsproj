@@ -41,12 +41,14 @@
     <Compile Include="Components\Transform.fs" />
     <Compile Include="Components\UI.fs" />
     <Compile Include="Components\Collider.fs" />
+    <Compile Include="Components\SpriteRenderer.fs" />
     <Compile Include="Components\Features.fs" />
     <Compile Include="Components\Gravity.fs" />
     <Compile Include="Systems\Input.fs" />
     <Compile Include="Systems\Exit.fs" />
     <Compile Include="Systems\Player.fs" />
     <Compile Include="Systems\Obstacles.fs" />
+    <Compile Include="Systems\Renderer.fs" />
     <Compile Include="Systems\Collision.fs" />
     <Compile Include="Systems\ColliderDebug.fs" />
     <Compile Include="Systems\Gravity.fs" />

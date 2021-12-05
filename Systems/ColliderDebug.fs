@@ -20,5 +20,4 @@ module private Systems =
 
 
 let configure (world: Container) =
-      [ //Systems.drawStatic world
-        Systems.draw world ]
+      [ Systems.draw world ]

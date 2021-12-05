@@ -13,11 +13,10 @@ type PlayerInput = { Direction: Vector2; Jump: PlayerButtomState }
 
 [<Struct>]
 type Player = {
-    Texture: Texture2D
     Size: Vector2
     Speed: single
     JumpForce: single
     PlayerState: PlayerState
 }
 
-[<Struct>]type Wall = { WallTexture: Texture2D }
+[<Struct>]type Wall = Wall

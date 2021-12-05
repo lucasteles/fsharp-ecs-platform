@@ -6,3 +6,4 @@ open Microsoft.Xna.Framework
 
 module Collider =
     let fromRect rect =  {ColliderBounds = rect}
+    let create offset size =  rect offset size |> fromRect

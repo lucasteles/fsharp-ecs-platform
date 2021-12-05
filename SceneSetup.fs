@@ -5,14 +5,14 @@ open Game.Scenes
 open Game.Systems
 
 let scenes () = [
-        Scene.create SceneName.Play [ Input.configure
+        Scene.create SceneName.Play [ Exit.configure
+                                      Input.configure
+                                      Renderer.configure
+                                      Obstacles.configure
                                       Gravity.configure
                                       Player.configure
-                                      Exit.configure
-                                      Obstacles.configure
                                       ColliderDebug.configure
-                                      Collision.configure
-                                      ]
+                                      Collision.configure ]
 
     ]
 

@@ -12,24 +12,18 @@ let wallsBound (game: Game) = [
     Rectangle(0,game.Window.ClientBounds.Height-wallSize,game.Window.ClientBounds.Width,wallSize)
 ]
 
+let load (world: Container) =
+        world.On <| fun (LoadContent game) ->
+            for bounds in (wallsBound game) do
+                let collider = Collider.fromRect bounds
+                let texture = colorTexture game Color.Black
+                world.Create()
+                    .With(collider)
+                    .With(Wall)
+                    .With(SpriteRenderer.create (texture, collider.ColliderBounds))
+                |> ignore
 
-
-module private Systems =
-    let load (world: Container) =
-            world.On <| fun (LoadContent game) ->
-                for bounds in (wallsBound game) do
-                    world.Create()
-                        .With(Collider.fromRect bounds)
-                        .With({WallTexture = colorTexture game Color.Black})
-                    |> ignore
-
-    let draw (world: Container) =
-        world.On<Draw> <| fun e ->
-            for query in world.Query<Wall, Collider>() do
-                let struct (wall, collider) = query.Values
-                e.SpriteBatch.Draw(wall.WallTexture, collider.ColliderBounds, Color.White)
 
 
 let configure (world: Container) =
-      [ Systems.load world
-        Systems.draw world]
+      [ load world ]
