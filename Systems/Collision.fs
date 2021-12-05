@@ -1,5 +1,6 @@
 module Game.Systems.Collision
 
+open System.Drawing
 open Game.Components
 open Game.Events
 open Garnet.Composition
@@ -27,28 +28,11 @@ module private Systems =
                         let actorRectangle = actorCollider.ColliderBounds.OffsetValue(position)
                         if (eid <> colliderEid && actorRectangle.Intersects(colliderRectangle)) then
 
-                            let horizontal =
-                                if (actorRectangle.Left >= colliderRectangle.Left
-                                   && actorRectangle.Left <= colliderRectangle.Right)
-                                   || (actorRectangle.Right >= colliderRectangle.Left
-                                   && actorRectangle.Right <= colliderRectangle.Right)
-                                   || (actorRectangle.Left <= colliderRectangle.Left
-                                   && actorRectangle.Right >= colliderRectangle.Right)
-                                then 1f else 0f
-
-                            let vertical =
-                                if (actorRectangle.Top >= colliderRectangle.Top
-                                   && actorRectangle.Top <= colliderRectangle.Bottom)
-                                   || (actorRectangle.Bottom >= colliderRectangle.Left
-                                   && actorRectangle.Bottom <= colliderRectangle.Right)
-                                   || (actorRectangle.Top <= colliderRectangle.Top
-                                   && actorRectangle.Bottom >= colliderRectangle.Bottom)
-                                then 1f else 0f
-
+                            let overlap = Rectangle.Intersect(actorRectangle, colliderRectangle)
                             let transformRef = &actor.Value1
                             transformRef <- {  transform
                                                with Position =
-                                                       Position (position - velocity * Vector2(horizontal, vertical) * e.DeltaTime.seconds) }
+                                                       Position (position - velocity * e.DeltaTime.seconds) }
 
                             let velocityRef = &actor.Value2
                             velocityRef <- Velocity Vector2.Zero

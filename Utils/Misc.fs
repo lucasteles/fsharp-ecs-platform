@@ -10,7 +10,7 @@ module TimeSpan =
     let seconds (t: TimeSpan) = single t.TotalSeconds
 type TimeSpan with member this.seconds = TimeSpan.seconds this
 
-let tap x = printfn "%A" x; x
+let inline tap x = printfn "%A" x; x
 let log x = printfn "%A" x
 let inline divideBy b a  = a / b
 
@@ -25,4 +25,7 @@ type Rectangle with
               value
     member this.ToRectangleF() =
               RectangleF(single this.X, single this.Y, single this.Width, single this.Height)
-    member this.Position = Vector2(single this.X, single this.Y)
+    member this.TopLeft = Vector2(single this.Left, single this.Top)
+    member this.TopRigt = Vector2(single this.Right, single this.Top)
+    member this.BottomLeft = Vector2(single this.Left, single this.Bottom)
+    member this.BottompRight = Vector2(single this.Right, single this.Bottom)
