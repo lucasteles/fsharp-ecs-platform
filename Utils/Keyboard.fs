@@ -5,6 +5,8 @@ open Microsoft.Xna.Framework.Input
 
 let (|KeyDown|_|) k (state: KeyboardState) =
     if state.IsKeyDown k then Some() else None
+let (|KeyUp|_|) k (state: KeyboardState) =
+    if state.IsKeyUp k then Some() else None
 
 let arrowLayout = Keys.Left,Keys.Down,Keys.Up,Keys.Right
 let wsadLayout = Keys.A,Keys.S,Keys.W,Keys.D

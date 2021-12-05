@@ -18,5 +18,7 @@ module Vector2 =
 type Vector2 with
     member inline this.WithX x = vector2 x this.Y
     member inline this.WithY y = vector2 this.X y
+    member this.Direction(other: Vector2) =
+        (other-this) |> Vector2.normalize
 
 let (|Vec|_|) v = v |> Vector2.toTuple |> Some

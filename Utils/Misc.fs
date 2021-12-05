@@ -25,3 +25,4 @@ type Rectangle with
               value
     member this.ToRectangleF() =
               RectangleF(single this.X, single this.Y, single this.Width, single this.Height)
+    member this.Position = Vector2(single this.X, single this.Y)

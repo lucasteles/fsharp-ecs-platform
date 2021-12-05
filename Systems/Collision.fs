@@ -11,27 +11,32 @@ module private Systems =
     let collide (world: Container) =
             world.On<Update> <| fun e ->
                 let actors = world.Query<Transform, Velocity, Collider, Eid>()
-                let staticColliders = world.Query<Collider, Eid>()
-                let colliders = world.Query<Collider, Transform, Eid>()
+                let colliders = world.Query<Collider, Eid>()
                 for actor in actors do
                     let struct ({ Position=(Position position) } as transform,
-                                (Velocity velocity),
+                                Velocity velocity,
                                 actorCollider,
                                 eid) = actor.Values
-                    for collider in staticColliders do
-                        let struct (collider, colliderEid) = collider.Values
-                        if (eid <> colliderEid
-                            && (actorCollider.ColliderBounds.OffsetValue(position)).Intersects(collider.ColliderBounds))
-                        then
-                            let comp = &actor.Value1
-                            comp <- {  transform with Position = Position (position - velocity) }
                     for collider in colliders do
-                        let struct (collider, {Position=(Position colliderPosition)}, colliderEid) = collider.Values
-                        if (eid <> colliderEid
-                            && (actorCollider.ColliderBounds.OffsetValue(position)).Intersects(collider.ColliderBounds.OffsetValue(colliderPosition)))
+                        let struct (collider, colliderEid) = collider.Values
+                        let entity = world.Get colliderEid
+                        let colliderRectangle =
+                            match entity.TryGet<Transform>() with
+                            | true, {Position=Position pos} -> collider.ColliderBounds.OffsetValue(pos)
+                            | false, _ -> collider.ColliderBounds
+                        let actorRectangle = actorCollider.ColliderBounds.OffsetValue(position)
+                        if (eid <> colliderEid && actorRectangle.Intersects(colliderRectangle))
                         then
-                            let comp = &actor.Value1
-                            comp <- {  transform with Position = Position (position - velocity) }
+                            let transformRef = &actor.Value1
+                            transformRef <- {  transform
+                                               with Position = Position (position - velocity * e.DeltaTime.seconds) }
+                            let velocityRef = &actor.Value2
+                            velocityRef <- Velocity Vector2.Zero
+                            world.Send({ Game = e.Game
+                                         From = eid
+                                         FromBounds = actorRectangle
+                                         Other = colliderEid
+                                         Bounds = colliderRectangle })
 
 let configure (world: Container) =
       [ Systems.collide world ]

@@ -9,13 +9,16 @@ open VectorModule
 open VectorModule
 open VectorModule
 open VectorModule
+open VectorModule
 
 module private Logic =
 
     let create (game: Game) = {
         Texture = colorTexture game Color.DarkRed
         Speed = 150f
-        Size = Vector2(50f,80f);
+        Size = Vector2(50f,80f)
+        JumpForce = 600f
+        PlayerState = PlayerState.Idle
     }
 
     let startPosition (game: Game) =
@@ -68,9 +71,28 @@ module private Systems =
     let updateVelocity (world: Container) =
             world.On<Update> <| fun _ ->
                 for query in world.Query<Velocity, PlayerInput, Player>() do
-                   let struct (_,input,player) = query.Values
-                   let comp = &query.Value1
-                   comp <- (input.Direction * player.Speed) |> Velocity
+                   let struct (Velocity vel,input,player) = query.Values
+                   let jump = input.Jump = PlayerButtomState.Pressed && player.PlayerState <> PlayerState.Jump
+
+                   let velocityRef = &query.Value1
+                   velocityRef <- Vector2(
+                               input.Direction.X * player.Speed,
+                               vel.Y + (if jump then -player.JumpForce else 0f)
+                           ) |> Velocity
+                   if jump then
+                       let playerRef = &query.Value3
+                       playerRef  <- { player with PlayerState = PlayerState.Jump }
+
+
+    let collision (world: Container) =
+        world.On<CollisionEnter> <| fun info ->
+            for query in world.Query<Player, Eid>() do
+                if info.From = query.Value2 then
+                    let player = query.Value1
+                    let playerRef = &query.Value1
+                    if player.PlayerState = PlayerState.Jump then
+                        playerRef <- {player with PlayerState = PlayerState.Idle}
+
 
     let draw (world: Container) =
         world.On<Draw> <| fun e ->
@@ -85,4 +107,5 @@ let configure (world: Container) =
        Systems.updateVelocity world
        Systems.updatePlayerPosition world
        Systems.draw world
+       Systems.collision world
     ]

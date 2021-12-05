@@ -6,11 +6,12 @@ open Game.Systems
 
 let scenes () = [
         Scene.create SceneName.Play [ Input.configure
-                                    //  Gravity.configure
+                                      Gravity.configure
                                       Player.configure
                                       Exit.configure
                                       Obstacles.configure
-                                      ColliderDebug.configure
+                                     // ColliderDebug.configure
+                                      Collision.configure
                                       ]
 
     ]
