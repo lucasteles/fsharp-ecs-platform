@@ -68,9 +68,9 @@ module private Systems =
 
 
     let collision (world: Container) =
-        world.On<CollisionEnter> <| fun info ->
+        world.On<CollisionEnter> <| fun collision ->
             for query in world.Query<Player, Eid>() do
-                if info.From = query.Value2 then
+                if collision.Is(query.Value2) then
                     let player = query.Value1
                     let playerRef = &query.Value1
                     if player.PlayerState = PlayerState.Jump then

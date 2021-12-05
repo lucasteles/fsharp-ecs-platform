@@ -14,6 +14,16 @@ open Microsoft.Xna.Framework.Graphics
 [<Struct>] type LoadContent =
             LoadContent of Game
                 member _.Data(LoadContent game) = game
-[<Struct>] type CollisionEnter = { Game: Game; From:Eid; FromBounds:Rectangle; Other: Eid; Bounds: Rectangle }
+
+[<Struct>]
+type TriggerEnter =
+    { Game: Game; TriggerFrom:Eid; FromBounds:Rectangle; Other: Eid; Bounds: Rectangle; Overlap: Rectangle }
+    member this.Is(eid: Eid) = this.TriggerFrom = eid
+
+[<Struct>]
+type CollisionEnter =
+    { Game: Game; CollideFrom:Eid; FromBounds:Rectangle; Other: Eid; Bounds: Rectangle; Overlap: Rectangle }
+    member this.Is(eid: Eid) = this.CollideFrom = eid
+
 [<Struct>] type Update = { DeltaTime: TimeSpan; Game: Game; ChangeScene: SceneName -> unit }
 [<Struct>] type Draw = { DeltaTime: TimeSpan; SpriteBatch: SpriteBatch; Game: Game}

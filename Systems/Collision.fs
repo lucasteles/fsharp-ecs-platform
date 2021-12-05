@@ -26,21 +26,29 @@ module private Systems =
                             | false, _ -> collider.ColliderBounds
                         let actorRectangle = actorCollider.ColliderBounds.OffsetValue(position)
                         if (eid <> colliderEid && actorRectangle.Intersects(colliderRectangle)) then
-
                             let overlap = Rectangle.Intersect(actorRectangle, colliderRectangle)
-                            let rawDirection = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
-                            let dir = vector2 (MathF.Round(rawDirection.X)) (MathF.Round(rawDirection.Y))
-                            let transformRef = &actor.Value1
-                            transformRef <- {  transform
-                                               with Position = Position (position - overlap.Size.ToVector2() * dir ) }
+                            if (actorCollider.IsTrigger || collider.IsTrigger) then
+                                world.Send({ Game = e.Game
+                                             TriggerFrom = eid
+                                             FromBounds = actorRectangle
+                                             Other = colliderEid
+                                             Bounds = colliderRectangle
+                                             Overlap = overlap})
+                            else
+                                let rawDirection = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
+                                let dir = vector2 (MathF.Round(rawDirection.X)) (MathF.Round(rawDirection.Y))
+                                let transformRef = &actor.Value1
+                                transformRef <- {  transform
+                                                   with Position = Position (position - overlap.Size.ToVector2() * dir ) }
 
-                            let velocityRef = &actor.Value2
-                            velocityRef <- Velocity (velocity - velocity * dir)
-                            world.Send({ Game = e.Game
-                                         From = eid
-                                         FromBounds = actorRectangle
-                                         Other = colliderEid
-                                         Bounds = colliderRectangle })
+                                let velocityRef = &actor.Value2
+                                velocityRef <- Velocity (velocity - velocity * dir)
+                                world.Send({ Game = e.Game
+                                             CollideFrom = eid
+                                             FromBounds = actorRectangle
+                                             Other = colliderEid
+                                             Bounds = colliderRectangle
+                                             Overlap = overlap})
 
 let configure (world: Container) =
       [ Systems.collide world ]
