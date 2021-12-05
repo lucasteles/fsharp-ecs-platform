@@ -1,11 +1,9 @@
 module Game.Systems.Collision
 
-open System.Drawing
 open Game.Components
 open Game.Events
 open Garnet.Composition
 open Microsoft.Xna.Framework
-
 
 
 module private Systems =
@@ -29,10 +27,11 @@ module private Systems =
                         if (eid <> colliderEid && actorRectangle.Intersects(colliderRectangle)) then
 
                             let overlap = Rectangle.Intersect(actorRectangle, colliderRectangle)
+                            let dir = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
                             let transformRef = &actor.Value1
                             transformRef <- {  transform
                                                with Position =
-                                                       Position (position - velocity * e.DeltaTime.seconds) }
+                                                       Position (position - velocity * dir * e.DeltaTime.seconds) }
 
                             let velocityRef = &actor.Value2
                             velocityRef <- Velocity Vector2.Zero

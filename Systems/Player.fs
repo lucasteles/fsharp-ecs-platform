@@ -15,9 +15,9 @@ module private Logic =
 
     let create (game: Game) = {
         Texture = colorTexture game Color.DarkRed
-        Speed = 150f
+        Speed = 300f
         Size = Vector2(50f,80f)
-        JumpForce = 600f
+        JumpForce = 1000f
         PlayerState = PlayerState.Idle
     }
 

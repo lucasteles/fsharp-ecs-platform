@@ -29,3 +29,4 @@ type Rectangle with
     member this.TopRigt = Vector2(single this.Right, single this.Top)
     member this.BottomLeft = Vector2(single this.Left, single this.Bottom)
     member this.BottompRight = Vector2(single this.Right, single this.Bottom)
+
