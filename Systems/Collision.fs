@@ -6,14 +6,14 @@ open Game.Events
 open Garnet.Composition
 open Microsoft.Xna.Framework
 
-let private updateEnteredColliderGroup colliderGroup collider entered =
+let private updateEnteredColliderGroup colliderGroup collider newCollider =
     {
         colliderGroup with
             Colliders =
             [|
                 for c in colliderGroup.Colliders do
                     if (c = collider)
-                    then  { c with Entered = entered }
+                    then newCollider
                     else c
             |]
     }
@@ -41,24 +41,27 @@ module private Systems =
                                 if eid <> colliderEid && actorRectangle.Intersects(colliderRectangle) then
                                     let overlap = Rectangle.Intersect(actorRectangle, colliderRectangle)
                                     if actorCollider.IsTrigger || collider.IsTrigger then
-                                        if not actorCollider.Entered || not collider.Entered then
-                                            world.Send({ Game = e.Game
-                                                         Origin = eid
-                                                         FromBounds = actorRectangle
-                                                         Other = colliderEid
-                                                         Bounds = colliderRectangle
-                                                         Overlap = overlap
-                                                         TriggerFrom= actorCollider
-                                                         TriggerWith = collider })
+                                        world.Send({ Game = e.Game
+                                                     Origin = eid
+                                                     FromBounds = actorRectangle
+                                                     Other = colliderEid
+                                                     Bounds = colliderRectangle
+                                                     Overlap = overlap
+                                                     TriggerFrom= actorCollider
+                                                     TriggerWith = collider })
                                     else
                                         let rawDirection = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
-                                        let dir = vector2 (MathF.Round(rawDirection.X)) (MathF.Round(rawDirection.Y))
+                                        let dir = vector2 (MathF.Round rawDirection.X) (MathF.Round rawDirection.Y)
+                                        let dir = if MathF.Abs(dir.X) = MathF.Abs(dir.Y) then vector2 dir.X 0f else dir
+                                        dir.Normalize()
+
                                         let transformRef = &actor.Value1
                                         transformRef <- {  transform
-                                                           with Position = Position (position - overlap.Size.ToVector2() * dir ) }
+                                                           with Position = Position (position - overlap.Size.ToVector2() * dir)}
 
                                         let velocityRef = &actor.Value2
                                         velocityRef <- Velocity.zero
+                                      //  velocityRef <- velocity - velocity * dir |> Velocity
                                         world.Send({ Game = e.Game
                                                      Origin = eid
                                                      FromBounds = actorRectangle
@@ -68,15 +71,6 @@ module private Systems =
                                                      CollideFrom = actorCollider
                                                      CollideWith = collider})
 
-//                                    if not actorCollider.Entered then
-//                                        actor.Value3 <- (updateEnteredColliderGroup actorColliderGroup actorCollider true)
-//                                    if not collider.Entered then
-//                                        other.Value1 <- (updateEnteredColliderGroup colliderGroup collider true)
-//                                else
-//                                    if actorCollider.Entered then
-//                                        actor.Value3 <- (updateEnteredColliderGroup actorColliderGroup actorCollider false)
-//                                    if collider.Entered then
-//                                        other.Value1 <- (updateEnteredColliderGroup colliderGroup collider false)
 
 let configure (world: Container) =
       [ Systems.collide world ]
