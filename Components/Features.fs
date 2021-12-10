@@ -3,7 +3,7 @@ namespace Game.Components
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 
-type PlayerButtomState = Pressed | Released
+type PlayerButtomState = Pressed | Pressing | Released
 
 type PlayerState = Idle | Jump
 

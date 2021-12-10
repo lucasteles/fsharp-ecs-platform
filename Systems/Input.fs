@@ -14,7 +14,7 @@ let direction kbState padState =
     let dir = kbDir + padDir
     Vector2.normalize dir
 
-let jump kbState padState =
+let jump currentState kbState padState =
     let kbJump =
         match kbState with
         | KeyDown Keys.Space -> true
@@ -24,7 +24,10 @@ let jump kbState padState =
         | ButtonDown Buttons.A -> true
         | _ -> false
     if kbJump || padJump
-    then PlayerButtomState.Pressed
+    then match currentState.Jump with
+         | PlayerButtomState.Pressed -> PlayerButtomState.Pressing
+         | PlayerButtomState.Released -> PlayerButtomState.Pressed
+         | PlayerButtomState.Pressing -> PlayerButtomState.Pressing
     else PlayerButtomState.Released
 
 let configure (world: Container) = [
@@ -35,6 +38,6 @@ let configure (world: Container) = [
             for query in world.Query<PlayerInput>() do
                 let playerInput = &query.Value
                 playerInput <- { Direction = direction kbState padState
-                                 Jump = jump kbState padState }
+                                 Jump = jump query.Value kbState padState |> tap}
     ]
 

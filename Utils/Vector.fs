@@ -1,5 +1,6 @@
 [<AutoOpen>]
 module VectorModule
+open System
 open Microsoft.Xna.Framework
 
 let inline vector2 x y = Vector2(single x, single y)
@@ -14,11 +15,13 @@ module Vector2 =
     let Down = vector2 0 1
     let Left = vector2 -1 0
     let Right = vector2 1 0
+    let Abs (vector: Vector2) = Vector2(MathF.Abs(vector.X), MathF.Abs(vector.Y))
 
 type Vector2 with
     member inline this.WithX x = vector2 x this.Y
     member inline this.WithY y = vector2 this.X y
     member this.Direction(other: Vector2) =
         (other-this) |> Vector2.normalize
+
 
 let (|Vec|_|) v = v |> Vector2.toTuple |> Some

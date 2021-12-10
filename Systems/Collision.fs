@@ -6,18 +6,6 @@ open Game.Events
 open Garnet.Composition
 open Microsoft.Xna.Framework
 
-let private updateEnteredColliderGroup colliderGroup collider newCollider =
-    {
-        colliderGroup with
-            Colliders =
-            [|
-                for c in colliderGroup.Colliders do
-                    if (c = collider)
-                    then newCollider
-                    else c
-            |]
-    }
-
 module private Systems =
     let collide (world: Container) =
             world.On<Update> <| fun e ->
@@ -51,8 +39,13 @@ module private Systems =
                                                      TriggerWith = collider })
                                     else
                                         let rawDirection = actorRectangle.Center.ToVector2().Direction(overlap.Center.ToVector2())
-                                        let dir = vector2 (MathF.Round rawDirection.X) (MathF.Round rawDirection.Y)
-                                        let dir = if MathF.Abs(dir.X) = MathF.Abs(dir.Y) then vector2 dir.X 0f else dir
+                                        let roundedDir = vector2 (MathF.Round rawDirection.X) (MathF.Round rawDirection.Y)
+                                        let dir = if MathF.Abs(roundedDir.X) = MathF.Abs(roundedDir.Y) then
+                                                     if overlap.Width <= overlap.Height
+                                                     then roundedDir.WithY(0f)
+                                                     else roundedDir.WithX(0f)
+                                                  else roundedDir
+
                                         dir.Normalize()
 
                                         let transformRef = &actor.Value1
@@ -60,8 +53,7 @@ module private Systems =
                                                            with Position = Position (position - overlap.Size.ToVector2() * dir)}
 
                                         let velocityRef = &actor.Value2
-                                        velocityRef <- Velocity.zero
-                                      //  velocityRef <- velocity - velocity * dir |> Velocity
+                                        velocityRef <- velocity - Vector2.Abs(velocity) * dir |> Velocity
                                         world.Send({ Game = e.Game
                                                      Origin = eid
                                                      FromBounds = actorRectangle
@@ -71,6 +63,18 @@ module private Systems =
                                                      CollideFrom = actorCollider
                                                      CollideWith = collider})
 
+
+let private updateEnteredColliderGroup colliderGroup collider newCollider =
+    {
+        colliderGroup with
+            Colliders =
+            [|
+                for c in colliderGroup.Colliders do
+                    if (c = collider)
+                    then newCollider
+                    else c
+            |]
+    }
 
 let configure (world: Container) =
       [ Systems.collide world ]
